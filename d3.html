@@ -1,0 +1,122 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARTS_1422_Data_ Visualization_Spring_2023_Homework 1_Task 1</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <svg width = "1000" height = "700"></svg>
+</body>
+</html>
+<script>
+//如何绘制折线图
+//https://blog.csdn.net/m0_63150077/article/details/122769874
+
+  var dataset = [{'Month': 'Jan','Temperature': 12.29},
+             {'Month': 'Feb','Temperature': 12.50},
+             {'Month': 'Mar','Temperature': 13.11},
+             {'Month': 'Apr','Temperature': 14.03},
+             {'Month': 'May','Temperature': 15.01},
+             {'Month': 'Jun','Temperature': 15.72},
+             {'Month': 'Jul','Temperature': 15.99},
+             {'Month': 'Aug','Temperature': 15.82},
+             {'Month': 'Sep','Temperature': 15.23},
+             {'Month': 'Oct','Temperature': 14.30},
+             {'Month': 'Nov','Temperature': 13.28},
+             {'Month': 'Dec','Temperature': 12.55}]
+
+  var svg = d3.select("svg"),
+  margin = 200,
+  width = svg.attr("width") - margin,
+  height = svg.attr("height") - margin;
+  var xScale = d3.scaleBand().range([0,width]),
+      yScale = d3.scaleLinear().range([height,0]);
+
+  //创建“组”元素，调整图表在SVG中的位置
+  var g =svg.append("g").attr("transform","translate("+100+","+100+")");
+
+
+  //使用data.map()映射离散月份给x
+  xScale.domain(
+    dataset.map(function(d){
+      return d.Month;
+    })
+  );
+
+  //对于y轴，用d3.max()将定义域设为[0,max]
+  yScale.domain([
+    12,
+    d3.max(dataset,function(d){
+      return d.Temperature;
+      }),
+    ]);
+  g.append("g")
+      .attr("calss","x axis")
+      .attr("transform","translate(0,"+height+")")
+      .call(d3.axisBottom(xScale))
+  svg.append("text")
+      .text(" Month")
+      .attr("y",height+150)
+      .attr("x",width+105)
+      .attr("stroke","black")
+      .attr("fill","black")
+      .attr("font-size","17px")
+      .style("text-anchor","end")
+ 
+
+  g.append("g")
+    .attr("class","y axis")
+    .call(
+        d3
+        .axisLeft(yScale)
+        .tickFormat(function(d){
+          return d+"℃";
+        })
+        .ticks(20)
+      )
+    .append("text")
+    .attr("transform","rotate(-90)")
+    .attr("y",-50)
+    .attr("dy","-5.lem")
+    .attr("text-anchor","end")
+    .attr("stroke","black")
+    .attr("fill","black")
+    .attr("font-size","17px")
+    .text("Temperature");
+
+  //https://www.bilibili.com/video/BV1Bt4y1y74Z/?spm_id_from=333.337.search-card.all.click&vd_source=a0ad47027e074efd76d25df235d75c36
+  var line = d3.line()
+        .x(function(d){
+          return xScale(d.Month);
+        })
+        .y(function(d){
+          return yScale(d.Temperature);
+        })
+
+
+  svg.append("path")
+      .datum(dataset)
+      .attr("fill","none")
+      .attr("stroke","#69b3a2")
+      .attr("stroke-width",2)
+      .attr("class","line")
+      .attr("transform","translate("+133.333333333+","+100+")")
+      //因为x轴用scaleBand()定义，所以横坐标没有顶着最左边开始，如果用scaleLinear(),Jan就会出现在原点。
+      .attr("d",line);
+ 
+
+
+  //贴标签
+  svg.append("text")
+  .attr("transform","translate(100,0)")
+  .attr("x",100)
+  .attr("y",50)
+  .attr("font-size","30")
+  .text("Global Monthly Mean Temperature");
+</script>
